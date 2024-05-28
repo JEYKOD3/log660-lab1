@@ -1,3 +1,5 @@
+package src;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -318,7 +320,13 @@ public class LectureBD {
          pstmt.setDate(3, Date.valueOf(anniv));
          pstmt.setString(4, lieu);
          pstmt.setString(5, photo);
+
+         // Tronquer la biographie à 255 caractères si nécessaire
+         if (bio.length() > 255) {
+            bio = bio.substring(0, 255);
+         }
          pstmt.setString(6, bio);
+
          pstmt.executeUpdate();
       } catch (SQLException e) {
          e.printStackTrace();
@@ -409,11 +417,22 @@ public class LectureBD {
          Class.forName("oracle.jdbc.driver.OracleDriver");
 
          // Informations de connexion JDBC
-         String url = "jdbc:oracle:thin:@bdlog660.ens.ad.etsmtl.ca:1521:bdlog660";
+         String url = "jdbc:oracle:thin:@//bdlog660.ens.ad.etsmtl.ca:1521/ORCLPDB.ens.ad.etsmtl.ca";
          String user = "EQUIPE111"; // Remplacez par votre nom d'utilisateur
          String password = "iVkGt1il"; // Remplacez par votre mot de passe
 
+         // Afficher les informations de connexion pour vérification
+         System.out.println("URL de connexion: " + url);
+         System.out.println("Nom d'utilisateur: " + user);
+
          conn = DriverManager.getConnection(url, user, password);
+
+         // Vérifier si la connexion est réussie
+         if (conn != null) {
+            System.out.println("Connexion réussie !");
+         } else {
+            System.out.println("Connexion échouée !");
+         }
       } catch (SQLException e) {
          e.printStackTrace();
       } catch (ClassNotFoundException e) {
@@ -422,10 +441,16 @@ public class LectureBD {
    }
 
    public static void main(String[] args) {
+      if (args.length < 3) {
+         System.out.println("Usage: java LectureBD <path_to_personnes_xml> <path_to_films_xml> <path_to_clients_xml>");
+         return;
+      }
+
       LectureBD lecture = new LectureBD();
 
       lecture.lecturePersonnes(args[0]);
       lecture.lectureFilms(args[1]);
       lecture.lectureClients(args[2]);
    }
+
 }
